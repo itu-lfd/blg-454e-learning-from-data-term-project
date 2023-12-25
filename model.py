@@ -1,4 +1,3 @@
-import argparse
 import os.path
 
 import numpy as np
@@ -62,9 +61,9 @@ class RandomForestModel:
         best_rf.fit(self.X_train, self.y_train)
         return best_rf.predict(self.X_test)
 
-    def plot_confusion_matrix(self, y_pred):
+    def plot(self, y_pred):
         """
-        plot confusion matrix for predicted and real values
+        plot confusion matrix and precision recall for predicted and real values
         """
         cm = confusion_matrix(self.y_test, y_pred)
         ConfusionMatrixDisplay(confusion_matrix=cm).plot()
@@ -108,5 +107,5 @@ if __name__ == '__main__':
     y = df['class']
     rf = RandomForestModel(X, y, pca_dims)
     pred = rf.predict()
-    rf.plot_confusion_matrix(pred)
+    rf.plot(pred)
     rf.print_scores(pred)
