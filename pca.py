@@ -2,7 +2,7 @@ from math import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 
-from helpers import check_null_column, get_data_from_csv, check_same_value_column
+from helpers import check_null_column, get_data_from_csv, check_same_value_column, init_parser
 
 
 class PCA:
@@ -95,7 +95,6 @@ class PCA:
         explained_variances = []
         for val in self.eigenvalues:
             explained_variances.append(val / total_variance)
-        print(explained_variances)
         plt.xlabel("Number of components")
         plt.ylabel("Explained variance")
         plt.plot(np.arange(len(self.eigenvalues)), explained_variances)
@@ -107,7 +106,7 @@ class PCA:
         """
         self._fit()
         self.projected_data = np.dot(self.normalized_features.T, self.extracted_eigenvectors.T)
-        np.save('pca_data.npy', self.projected_data)
+        np.save(f'saved/pca_data_dim{self.desired_principal_components}.npy', self.projected_data)
 
     def plot_projected(self, dim=2):
         """
@@ -120,6 +119,10 @@ class PCA:
                          c=self.cols[1])
             fig.savefig(f'plots/pca-plot-{dim}.png')
             fig.show()
+        elif dim == 1:
+            plt.scatter(self.projected_data[:, 0], self.cols[1])
+            plt.savefig(f'plots/pca-plot-{dim}.png')
+            plt.show()
         else:
             plt.scatter(self.projected_data[:, 0], self.projected_data[:, 1], c=self.cols[1])
             plt.savefig(f'plots/pca-plot-{dim}.png')
@@ -127,7 +130,17 @@ class PCA:
 
 
 if __name__ == '__main__':
-    dim = 2
+    args = init_parser(args=[
+        {
+            'name': '--pca_dims',
+            'dest': 'pca_dims',
+            'default': 2,
+            'choices': [1, 2, 3],
+            'type': int,
+            'help': 'Use PCA',
+        },
+    ])
+    dim = args.pca_dims
     pca = PCA(desired_principal_components=dim, path='data/aps_failure_training_set.csv')
     pca.save_data()
     pca.plot_projected(dim=dim)

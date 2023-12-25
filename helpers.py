@@ -1,3 +1,4 @@
+import argparse
 import csv
 
 import numpy as np
@@ -77,3 +78,14 @@ def read_csv_with_pandas(path):
     for col in df.columns[2:]:
         df[col] = df[col].astype(float)
     return df
+
+
+def init_parser(args):
+    """
+    init argument parser with given arguments
+    """
+    parser = argparse.ArgumentParser()
+    for arg in args:
+        name = arg.pop('name')
+        parser.add_argument(name, **arg)
+    return parser.parse_args()
