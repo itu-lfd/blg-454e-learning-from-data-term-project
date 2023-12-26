@@ -5,20 +5,22 @@ from matplotlib import pyplot as plt
 from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score
-
 from helpers import read_csv_with_pandas
-
-# pca_data = np.load("pca_data.npy")
-# df = pd.DataFrame(data=data)
 
 df = read_csv_with_pandas(path='data/aps_failure_training_set.csv')
 
+count0 = sum([1 for i in df['class'] if not i])
+print('percentage of neg class:', count0/len(df['class']))  # gives 0.98 -> highly imbalanced dataset
+
+for col in df.columns:
+    print(f'for column {col} there are {df[col].isna().sum()} nan values.')
+
 # print(df.describe(include='all').T)
 # print(df.dtypes)
-sns.boxplot(y=df["cn_008"].values)
-plt.title("Boxplot of cn_008")
-plt.show()
-plt.close()
+# sns.boxplot(y=df["cn_008"].values)
+# plt.title("Boxplot of cn_008")
+# plt.show()
+# plt.close()
 
 # outlier detection
 X = df.drop(labels=['class', 'id'], axis=1)

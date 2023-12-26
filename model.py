@@ -45,7 +45,7 @@ class RandomForestModel:
         np.save(fname, rand_search.best_params_)
         return best_rf
 
-    def predict(self):
+    def predict(self, threshold=0.5):
         """
         predict y values for the test dataset after fit and return predicted values
         """
@@ -59,9 +59,10 @@ class RandomForestModel:
         else:
             best_rf = self.find_best(param_dist, fname=f'saved/best_hyper_params.npy')
         best_rf.fit(self.X_train, self.y_train)
-        return best_rf.predict(self.X_test)
+        predicted_prob = best_rf.predict_proba(self.X_test)
+        return predicted_prob, (predicted_prob[:, 1] >= threshold).astype('int')
 
-    def plot(self, y_pred):
+    def plot(self, y_pred, y_prob):
         """
         plot confusion matrix and precision recall for predicted and real values
         """
@@ -69,15 +70,15 @@ class RandomForestModel:
         ConfusionMatrixDisplay(confusion_matrix=cm).plot()
         plt.savefig('plots/rf_confusion_matrix.png')
         PrecisionRecallDisplay.from_predictions(
-            self.y_test, y_pred, name="RandomForest", plot_chance_level=True,
+            self.y_test, y_prob[:, 1], name="RandomForest", plot_chance_level=True,
         )
         plt.savefig('plots/rf_precision_recall.png')
 
-    def print_scores(self, y_pred):
+    def print_scores(self, y_pred, y_prob):
         accuracy = accuracy_score(self.y_test, y_pred)
         precision = precision_score(self.y_test, y_pred)
         recall = recall_score(self.y_test, y_pred)
-        average_precision = average_precision_score(self.y_test, y_pred)
+        average_precision = average_precision_score(self.y_test, y_prob[:, 1])
         print("Accuracy:", accuracy)
         print("Precision:", precision)
         print("Average Precision:", average_precision)
@@ -106,6 +107,6 @@ if __name__ == '__main__':
         X = df.drop(labels=['id', 'class'], axis=1)
     y = df['class']
     rf = RandomForestModel(X, y, pca_dims)
-    pred = rf.predict()
-    rf.plot(pred)
-    rf.print_scores(pred)
+    prob, pred = rf.predict(threshold=0.95)
+    rf.plot(pred, prob)
+    rf.print_scores(pred, prob)
