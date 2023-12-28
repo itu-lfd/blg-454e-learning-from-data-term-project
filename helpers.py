@@ -89,3 +89,17 @@ def init_parser(args):
         name = arg.pop('name')
         parser.add_argument(name, **arg)
     return parser.parse_args()
+
+# Function to impute missing values with mean
+def impute_with_mean(dataset):
+    # Calculate mean along each column (axis=0)
+    column_means = np.nanmean(dataset, axis=0)
+    
+    # Find indices of missing values
+    missing_indices = np.isnan(dataset)
+    
+    # Replace missing values with corresponding column means using boolean indexing
+    dataset[missing_indices] = np.where(missing_indices, column_means, dataset)
+    
+    return dataset
+
