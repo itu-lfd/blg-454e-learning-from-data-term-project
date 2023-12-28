@@ -11,6 +11,7 @@ class PCA:
     """
 
     def __init__(self, desired_principal_components, path):
+        self.path = path
         self.desired_principal_components = desired_principal_components
         self.extracted_eigenvectors = None
         self.headers, self.cols, self.rows = self._read_csv(path)
@@ -106,7 +107,10 @@ class PCA:
         """
         self._fit()
         self.projected_data = np.dot(self.normalized_features.T, self.extracted_eigenvectors.T)
-        np.save(f'saved/pca_data_dim{self.desired_principal_components}.npy', self.projected_data)
+        if 'test' in self.path:
+            np.save(f'saved/pca_data_test_dim{self.desired_principal_components}.npy', self.projected_data)
+        else:
+            np.save(f'saved/pca_data_dim{self.desired_principal_components}.npy', self.projected_data)
 
     def plot_projected(self, dim=2):
         """
