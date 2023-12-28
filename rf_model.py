@@ -40,10 +40,9 @@ class RandomForestModel:
         # Fit the random search object to the data
         rand_search.fit(self.X_train, self.y_train)
         # Create a variable for the best model
-        best_rf = rand_search.best_estimator_
+        self.model = rand_search.best_estimator_
         print('Best hyperparameters:', rand_search.best_params_)
         np.save(fname, rand_search.best_params_)
-        return best_rf
 
     def predict(self, threshold=0.5):
         """
@@ -55,12 +54,20 @@ class RandomForestModel:
             'min_samples_split': [2, 5, 10, 50],
         }
         if self.pca_dims:
-            best_rf = self.find_best(param_dist, fname=f'saved/best_hyper_params_pca{pca_dims}.npy')
+            self.find_best(param_dist, fname=f'saved/best_hyper_params_pca{pca_dims}.npy')
         else:
-            best_rf = self.find_best(param_dist, fname=f'saved/best_hyper_params.npy')
-        best_rf.fit(self.X_train, self.y_train)
-        predicted_prob = best_rf.predict_proba(self.X_test)
+            self.find_best(param_dist, fname=f'saved/best_hyper_params.npy')
+        self.model.fit(self.X_train, self.y_train)
+        predicted_prob = self.model.predict_proba(self.X_test)
         return predicted_prob, (predicted_prob[:, 1] >= threshold).astype('int')
+
+    def save_test_file(self, X_test):
+        y_pred = self.model.predict(X_test)
+        d = {'id': [], 'class': []}
+        for id, pred in enumerate(y_pred):
+            d['id'].append(id+1)
+            d['class'].append('pos') if pred else d['class'].append('neg')
+        pd.DataFrame(data=d).to_csv('data/submission.csv', index=False)
 
     def plot(self, y_pred, y_prob):
         """
@@ -110,3 +117,7 @@ if __name__ == '__main__':
     prob, pred = rf.predict(threshold=0.95)
     rf.plot(pred, prob)
     rf.print_scores(pred, prob)
+    df_test = pd.read_csv('data/aps_failure_test_set.csv')
+    df_test.replace(to_replace='na', value=0, inplace=True)
+    X_test = df_test.drop(labels=['id'], axis=1)
+    rf.save_test_file(X_test)
