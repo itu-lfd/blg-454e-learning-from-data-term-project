@@ -94,12 +94,20 @@ class PCA:
         """
         total_variance = sum(self.eigenvalues)
         explained_variances = []
-        for val in self.eigenvalues:
-            explained_variances.append(val / total_variance)
+        cumulative = [0]
+        for i in range(len(self.eigenvalues)):
+            explained_variances.append(self.eigenvalues[i] / total_variance)
+            cumulative.append(cumulative[i] + (self.eigenvalues[i] / total_variance))
+        cumulative.pop(0)
         plt.xlabel("Number of components")
         plt.ylabel("Explained variance")
-        plt.plot(np.arange(len(self.eigenvalues)), explained_variances)
+        plt.bar(np.arange(len(self.eigenvalues)), explained_variances, align='center', label='individual')
+        plt.step(np.arange(len(self.eigenvalues)), cumulative, where='mid', label='cumulative')
+        plt.legend(loc='upper left')
         plt.savefig(f'plots/pca-explained-variance.png')
+        print(f'Total variance explanied for all dimensions:')
+        for i, val in enumerate(cumulative):
+            print(f"{i+1}:, {val}")
 
     def save_data(self):
         """
