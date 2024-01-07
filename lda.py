@@ -54,17 +54,17 @@ class LDA:
             mean_c = np.mean(X_c, axis=0)
             # (4, n_c) * (n_c, 4) = (4,4) -> transpose
             SW += (X_c - mean_c).T.dot((X_c - mean_c))
-            print(SW)
+            #print(SW)
             # (4, 1) * (1, 4) = (4,4) -> reshape
             n_c = X_c.shape[0]
             mean_diff = (mean_c - mean_overall).reshape(n_features, 1)
             SB += n_c * (mean_diff).dot(mean_diff.T)
 
-        print(np.linalg.det(SW))
+        #print(np.linalg.det(SW))
         alpha = 0.1
         identity_matrix = np.identity(SW.shape[0])
         SW = SW + alpha * identity_matrix
-        print(np.linalg.det(SW))
+        #print(np.linalg.det(SW))
         # Determine SW^-1 * SB
         A = np.linalg.inv(SW).dot(SB)
         # Get eigenvalues and eigenvectors of SW^-1 * SB
@@ -81,7 +81,7 @@ class LDA:
     def transform(self, X):
         # project data
         return np.dot(X, self.linear_discriminants.T)
-
+"""
 if __name__ =='__main__':
     lda = LDA(1)
     # df = pd.read_csv("raw_data/aps_failure_training_set.csv")
@@ -115,3 +115,4 @@ if __name__ =='__main__':
     plt.xlabel('LDA Component 1')
     plt.title('Scatter Plot of LDA-transformed Data')
     plt.show()
+"""
