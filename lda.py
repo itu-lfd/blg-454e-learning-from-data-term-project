@@ -84,8 +84,8 @@ class LDA:
 """
 if __name__ =='__main__':
     lda = LDA(1)
-    # df = pd.read_csv("raw_data/aps_failure_training_set.csv")
-    headers, cols, rows = lda._read_csv("raw_data/aps_failure_training_set.csv")
+    # df = pd.read_csv("data/aps_failure_training_set.csv")
+    headers, cols, rows = lda._read_csv("data/aps_failure_training_set.csv")
 
     features, target = lda.take_features_target(headers, cols, rows)
 

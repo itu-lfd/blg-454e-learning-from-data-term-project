@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 
 #headers, cols, rows = get_data_from_csv("data/aps_failure_training_set.csv")
-df = pd.read_csv("raw_data/aps_failure_training_set.csv")
+df = pd.read_csv("data/aps_failure_training_set.csv")
 
 features = df.iloc[:, 2:]
 features.replace('na', np.nan, inplace=True)
